@@ -27,7 +27,7 @@ class NodeVector():
         return self._avaliable_space[config.MEMORY]
     def migrate_vm(self, vm: VirtualMachine):
         #TODO didn't check the upper bound of the avaliable_space.
-        if(vm.get_id() is in self._vm_id_list):
+        if vm.get_id() in self._vm_id_list:
             # delete the id of virtual machine.
             vm_index = self._vm_id_list.index(vm.get_id())
             del self._vm_id_list[vm_index]
@@ -41,9 +41,9 @@ class NodeVector():
             vm_mode = vm.get_node_mode()
             cpu_required = vm.get_cpu_required()
             mem_required = vm.get_mem_required()
-            if self._avaliable_space[config.CORE] != 0 and
-               self._avaliable_space[config.MEMORY] != 0 and 
-               self._avaliable_space[config.CORE] >= cpu_required and
+            if self._avaliable_space[config.CORE] != 0 and \
+               self._avaliable_space[config.MEMORY] != 0 and  \
+               self._avaliable_space[config.CORE] >= cpu_required and \
                self._avaliable_space[config.MEMORY] >= mem_required:
                 return True
             else:

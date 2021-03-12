@@ -14,7 +14,7 @@ class VirtualMachine():
                  mode: config.node_mode):
         self._id = id
         self._spec = {
-                config.CORE: specification[config.CORE]
+                config.CORE: specification[config.CORE],
                 config.MEMORY: specification[config.MEMORY]
         }
         # TODO maybe when we initialize a vm, the current location could be left out.
