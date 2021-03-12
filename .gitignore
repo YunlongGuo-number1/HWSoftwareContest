@@ -16,3 +16,7 @@ build
 # My configurations 自定义文件:
 db.ini
 deploy_key_rsa
+
+
+.DS_Store
+.vscode
