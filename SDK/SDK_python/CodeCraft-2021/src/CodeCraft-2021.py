@@ -5,6 +5,5 @@ def main():
     # sys.stdout.flush()
     print("hello world")
 
-
 if __name__ == "__main__":
     main()
