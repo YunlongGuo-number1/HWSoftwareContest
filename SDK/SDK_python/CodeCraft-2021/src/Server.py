@@ -35,7 +35,7 @@ class NodeVector():
         return self._avaliable_space[config.MEMORY]
     
     # 尝试进行虚拟机删除
-    def delete_vm(self, vm: VirtualMachine):
+    def delete_vm(self, vm: VirtualMachine)->bool:
         #TODO didn't check the upper bound of the avaliable_space.
         if vm.get_id() in self._vm_id_list:
             # delete the id of virtual machine.
@@ -46,6 +46,11 @@ class NodeVector():
             self._avaliable_space[config.MEMORY] += vm.get_avaliable_mem()
             # 删除虚拟机的硬件环境（服务器编号，节点）
             vm.delete_location()
+            print('success to delete vm, id = ', vm.get_id())
+            return True
+        else: 
+            print('failed to delete vm, id = ', vm.get_id())
+            return False
             
         
     # call this method to check the capacity of cpu and memory.
@@ -114,7 +119,7 @@ class Server():
                                              self._server_number)
         }
                                              
-    # TODO 设置电源的接口
+    # 设置电源的接口
     def set_power_status(self, status: POWER):
         self._power_status = status
 
@@ -137,14 +142,10 @@ class Server():
         # TODO 迁移虚拟机的上层接口
     
 
-    # TODO 删除虚拟机的上层接口
+    # TODO 删除虚拟机的上层接口, 这里暂时只是删除操作，没有告知是否删除成功
     def delete_vm_from_nodes(self, vm: VirtualMachine):
         if self._nodes['A'].find_vm_list(vm.get_id()):
             self._nodes['A'].delete_vm(vm)
-            return None
-        elif self._nodes['B'].find_vm_list(vm.get_id()):
-            pass
-
-
-        # TODO 添加虚拟机的上层接口
+        if self._nodes['B'].find_vm_list(vm.get_id()):
+            self._nodes['B'].delete_vm(vm)
     # member var.
