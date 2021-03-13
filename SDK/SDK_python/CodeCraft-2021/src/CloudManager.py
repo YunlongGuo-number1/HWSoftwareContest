@@ -1,6 +1,7 @@
 from DataLoad import DataLoad
 from Server import Server
 from VirtualMachine import VirtualMachine
+import config
 class CloudManager():
     #调度
     # TODO 初始化，读取DataLoad对象，并获取服务器，虚拟机，用户请求等信息。
@@ -11,7 +12,7 @@ class CloudManager():
         self._vm_request = dataload.get_vm_request()
         self._server_buyed = [] # 服务器对象列表
         self._server_used = []  # 服务器对象列表
-        self._vm_setted_list = [] # 虚拟机对象列表
+        self._vm_setted_list = [] # 虚拟机对象列表 
 
 
     # TODO 创建服务器对象列表，虚拟机对象列表, 作为成员变量
@@ -43,8 +44,8 @@ class CloudManager():
                 for server in self._server_used:
                     if server.get_server_num() == current_position[config.SERVER_NUMBER]:
                         server.delete_vm_from_nodes(vm)
-    
 
+    
     
     
     # TODO 部署
