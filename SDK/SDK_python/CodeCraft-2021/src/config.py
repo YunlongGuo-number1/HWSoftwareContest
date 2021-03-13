@@ -18,6 +18,7 @@ CORE = 'cpu_core'
 specification_dict = dict
 model_type = str
 INVALID_MODEL = 'NULl'
+SERVER_MODEL_NAME = str
 
 
 
