@@ -44,7 +44,7 @@ INVALID_SERVER_NUM = -1
 vector_size = int
 
 
-# virual machine users purchase
+# virtual machine users purchase
 vm_type = str
 INVALID_POSITION = {SERVER_NUMBER: INVALID_SERVER_NUM,
                     NODE_NAME: INVALID_NODE}
@@ -61,5 +61,12 @@ INVALID_ID = -1
 # check capacity
 @unique
 class node_mode(Enum):
+    invalid_mode = -1
     single_mode = 0
     double_mode = 1
+
+# power status
+@unique
+class POWER(Enum):
+    ON = 0
+    OFF = 1

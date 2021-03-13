@@ -1,7 +1,9 @@
 # Copyright 2021 Gyl, Lbf, Lyb. All Rights Reserved.
 import config
-import VirtualMachine
-
+from VirtualMachine import VirtualMachine
+from config import POWER
+from config import node_name
+from config import node_mode
 
 # ====================================================================
 # there should be a vector maintain a map containing the info of virtual machine
@@ -16,11 +18,13 @@ class NodeVector():
     # 输入格式如下
     # size = {config.CORE: 32, config.MEMORY: 64}
     # vector_a = NodeVector(size)
-    def __init__(self, size: config.specification_dict, server_num: config.server_number):
+    def __init__(self, node: config.node_name,size: config.specification_dict, server_num: config.server_number):
         self._size = size
         self._avaliable_space = size
+        # TODO maybe a list is not efficient enough.
         self._vm_id_list = []
         self._server_num = server_num
+        self._node_name = node
 
     # 获取可用的CPU核心数
     def get_avaliable_cpu(self)->config.cpu_core:
@@ -31,7 +35,7 @@ class NodeVector():
         return self._avaliable_space[config.MEMORY]
     
     # 尝试进行虚拟机删除
-    def delete_vm(self, vm: VirtualMachine):
+    def delete_vm(self, vm: VirtualMachine)->bool:
         #TODO didn't check the upper bound of the avaliable_space.
         if vm.get_id() in self._vm_id_list:
             # delete the id of virtual machine.
@@ -40,7 +44,14 @@ class NodeVector():
             # free the core and memory.
             self._avaliable_space[config.CORE] += vm.get_avaliable_cpu()
             self._avaliable_space[config.MEMORY] += vm.get_avaliable_mem()
-            # TODO 删除虚拟机的硬件环境（服务器编号，节点）
+            # 删除虚拟机的硬件环境（服务器编号，节点）
+            vm.delete_location()
+            print('success to delete vm, id = ', vm.get_id())
+            return True
+        else: 
+            print('failed to delete vm, id = ', vm.get_id())
+            return False
+            
         
     # call this method to check the capacity of cpu and memory.
     def check_capacity(self, vm: VirtualMachine)->bool:
@@ -58,14 +69,20 @@ class NodeVector():
     # this method should be the only interface which allow managers to insert vm.
     # and after inverting, _avaliable_space should be updated.
     # 尝试进行虚拟机部署，此处需要输入一个虚拟机实例，通过检查虚拟机实例的节点部署规则和所需内存，核心数，来在服务器节点中部署虚拟机
-    def insert_vm(self, vm: VirtualMachine):
+    def insert_vm(self, vm: VirtualMachine)->bool:
         if self.check_capacity(vm):
             self._vm_id_list.append(vm.get_id)
             self._avaliable_space[config.CORE] -= vm.get_cpu_required()
             self._avaliable_space[config.MEMORY] -= vm.get_mem_required()
-            # TODO 配置虚拟机的硬件环境（服务器编号，节点）
+            # 配置虚拟机的硬件环境（服务器编号，节点）
+            vm.set_location(self._server_num, self._node_name)
+            return True
         else:
             print('fail to insert vm')
+            return False
+    
+    def find_vm_list(self, id: config.ID):
+        return id in self._vm_id_list
             
 
 
@@ -92,19 +109,43 @@ class Server():
         self._cost = {config.HARDWARE_COST, cost[config.HARDWARE_COST],
                       config.SOFTWARE_COST, cost[config.SOFTWARE_COST]}
         self._power_status = power_status
-        #initialize the node A.
-        self._node = {
+        #initialize the node A, B
+        self._nodes = {
+            config.A: NodeVector(config.A, {config.CORE: self._spec[config.CORE] /2, 
+                                             config.MEMORY: self._spec[config.MEMORY]/ 2},
+                                             self._server_number),
+            config.B: NodeVector(config.B, {config.CORE: self._spec[config.CORE] /2, 
+                                             config.MEMORY: self._spec[config.MEMORY]/ 2},
+                                             self._server_number)
         }
+                                             
+    # 设置电源的接口
+    def set_power_status(self, status: POWER):
+        self._power_status = status
 
-        # TODO node为空时，server对象的power_status为OFF
-
-        # TODO 设置电源的接口
-
-        # TODO 部署虚拟机
-
+    # 部署虚拟机的接口
+    def deploy_vm(self, vm: VirtualMachine, node: node_name = ''):
+        vm_node = vm.get_node_mode()
+        # 如果虚拟机为双节点部署，则不需要用node_name这个参数, 不清楚这样会不会影响效率
+        if vm_node == node_mode.double_mode and node_name == node_mode.invalid_mode:
+                if self._nodes[config.A].insert_vm(vm) and self._nodes[config.B].insert_vm(vm) :
+                    return True
+                else: return False
+        elif vm_node == node_mode.single_mode and node_name != '':
+                if self._nodes[node_name].insert_vm(vm):
+                    return True
+                else:
+                    return False
+        return False
+                
+            
         # TODO 迁移虚拟机的上层接口
+    
 
-        # TODO 删除虚拟机的上层接口
-
-        # TODO 添加虚拟机的上层接口
+    # TODO 删除虚拟机的上层接口, 这里暂时只是删除操作，没有告知是否删除成功
+    def delete_vm_from_nodes(self, vm: VirtualMachine):
+        if self._nodes['A'].find_vm_list(vm.get_id()):
+            self._nodes['A'].delete_vm(vm)
+        if self._nodes['B'].find_vm_list(vm.get_id()):
+            self._nodes['B'].delete_vm(vm)
     # member var.
