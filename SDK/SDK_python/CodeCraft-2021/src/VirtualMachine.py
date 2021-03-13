@@ -63,3 +63,11 @@ class VirtualMachine():
                                   
     def delete_location(self):
         self._current_position = config.INVALID_POSITION
+    
+    # 该函数返回当前虚拟机所在的服务器编号及节点，
+    # 读取该位置如下所示
+    # cur_pos = vm_obj.get_current_pos()
+    # server_num = cur_pos[config.SERVER_NUMBER]
+    # node_name = cur_pos[config.NODE_NAME]
+    def get_current_pos(self):
+        return self._current_position
