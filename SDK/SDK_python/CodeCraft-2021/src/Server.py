@@ -138,14 +138,13 @@ class Server():
                     return False
         return False
                 
-            
-        # TODO 迁移虚拟机的上层接口
-    
-
     # TODO 删除虚拟机的上层接口, 这里暂时只是删除操作，没有告知是否删除成功
     def delete_vm_from_nodes(self, vm: VirtualMachine):
         if self._nodes['A'].find_vm_list(vm.get_id()):
             self._nodes['A'].delete_vm(vm)
         if self._nodes['B'].find_vm_list(vm.get_id()):
             self._nodes['B'].delete_vm(vm)
-    # member var.
+
+    # 该函数返回服务器对象的编号
+    def get_server_num(self):
+        return self._server_number
