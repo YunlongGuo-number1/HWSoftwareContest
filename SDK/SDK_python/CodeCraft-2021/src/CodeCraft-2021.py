@@ -3,7 +3,7 @@ def main():
     # process
     # to write standard output
     # sys.stdout.flush()
-    pass
+    print("hello world")
 
 
 if __name__ == "__main__":
