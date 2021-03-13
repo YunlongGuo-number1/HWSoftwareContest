@@ -4,6 +4,7 @@
 # in this files we define some data type as the concept we could read easily
 # ====================================================================
 
+from enum import Enum, unique
 
 
 # is_on is to mark if the server's power is set to ON.
@@ -48,13 +49,16 @@ INVALID_POSITION = {SERVER_NUMBER: INVALID_SERVER_NUM,
                     NODE_NAME: INVALID_NODE}
 server_number_index = 0
 node_index = 1
+MODEL_NAME = "model_name"
+model_name = str
 
 
 ID = int
 INVALID_ID = -1
 
 
-# check capacity 
-node_mode = bool
-double_mode = True
-single_mode = False
+# check capacity
+@unique
+class node_mode(Enum):
+    single_mode = 0
+    double_mode = 1
