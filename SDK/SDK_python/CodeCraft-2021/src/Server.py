@@ -14,13 +14,6 @@ class NodeVector():
         self._size = size
         self._avaliable_space = size
         self._vm_id_list = []
-    # this method should be the only interface which allow managers to insert vm.
-    # and after inverting, _avaliable_space should be updated.
-    def insert_vm(self, vm: VirtualMachine):
-        if self.check_capacity():
-            self._vm_id_list.append(vm.get_id)
-            self._avaliable_space[config.CORE] -= vm.get_cpu_required()
-            self._avaliable_space[config.MEMORY] -= vm.get_mem_required()
     def get_avaliable_cpu(self)->config.cpu_core:
         return self._avaliable_space[config.CORE]
     def get_avaliable_mem(self)->config.memory_capacity:
@@ -34,11 +27,9 @@ class NodeVector():
             # free the core and memory.
             self._avaliable_space[config.CORE] += vm.get_avaliable_cpu()
             self._avaliable_space[config.MEMORY] += vm.get_avaliable_mem()
-
         
     # call this method to check the capacity of cpu and memory.
     def check_capacity(self, vm: VirtualMachine)->bool:
-            vm_mode = vm.get_node_mode()
             cpu_required = vm.get_cpu_required()
             mem_required = vm.get_mem_required()
             if self._avaliable_space[config.CORE] != 0 and \
@@ -49,6 +40,13 @@ class NodeVector():
             else:
                 print("no space available!")
                 return False
+    # this method should be the only interface which allow managers to insert vm.
+    # and after inverting, _avaliable_space should be updated.
+    def insert_vm(self, vm: VirtualMachine):
+        if self.check_capacity(vm):
+            self._vm_id_list.append(vm.get_id)
+            self._avaliable_space[config.CORE] -= vm.get_cpu_required()
+            self._avaliable_space[config.MEMORY] -= vm.get_mem_required()
             
 
 
