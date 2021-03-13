@@ -10,15 +10,28 @@ import VirtualMachine
 
 # TODO i didn't check the size.
 class NodeVector():
-    def __init__(self, size: config.specification_dict):
+    # 节点容器是对象是属于服务器对象的一部分，一个服务器对象拥有两个节点，
+    # 初始化服务器实例时，应当同时初始化服务器中的两个节点
+    # 初始化一个节点需要输入两个维度的容量大小（cpu, memory）
+    # 输入格式如下
+    # size = {config.CORE: 32, config.MEMORY: 64}
+    # vector_a = NodeVector(size)
+    def __init__(self, size: config.specification_dict, server_num: config.server_number):
         self._size = size
         self._avaliable_space = size
         self._vm_id_list = []
+        self._server_num = server_num
+
+    # 获取可用的CPU核心数
     def get_avaliable_cpu(self)->config.cpu_core:
         return self._avaliable_space[config.CORE]
+
+    # 获取可用的内存
     def get_avaliable_mem(self)->config.memory_capacity:
         return self._avaliable_space[config.MEMORY]
-    def migrate_vm(self, vm: VirtualMachine):
+    
+    # 尝试进行虚拟机删除
+    def delete_vm(self, vm: VirtualMachine):
         #TODO didn't check the upper bound of the avaliable_space.
         if vm.get_id() in self._vm_id_list:
             # delete the id of virtual machine.
@@ -27,6 +40,7 @@ class NodeVector():
             # free the core and memory.
             self._avaliable_space[config.CORE] += vm.get_avaliable_cpu()
             self._avaliable_space[config.MEMORY] += vm.get_avaliable_mem()
+            # TODO 删除虚拟机的硬件环境（服务器编号，节点）
         
     # call this method to check the capacity of cpu and memory.
     def check_capacity(self, vm: VirtualMachine)->bool:
@@ -40,13 +54,18 @@ class NodeVector():
             else:
                 print("no space available!")
                 return False
+
     # this method should be the only interface which allow managers to insert vm.
     # and after inverting, _avaliable_space should be updated.
+    # 尝试进行虚拟机部署，此处需要输入一个虚拟机实例，通过检查虚拟机实例的节点部署规则和所需内存，核心数，来在服务器节点中部署虚拟机
     def insert_vm(self, vm: VirtualMachine):
         if self.check_capacity(vm):
             self._vm_id_list.append(vm.get_id)
             self._avaliable_space[config.CORE] -= vm.get_cpu_required()
             self._avaliable_space[config.MEMORY] -= vm.get_mem_required()
+            # TODO 配置虚拟机的硬件环境（服务器编号，节点）
+        else:
+            print('fail to insert vm')
             
 
 
@@ -63,19 +82,29 @@ class Server():
     def __init__(self, serial_number: config.server_number, 
                  specification: config.specification_dict, 
                  cost: config.cost_dict, 
-                 power_status: config.is_on, 
-                 model: config.model_type):
+                 power_status: config.is_on):
 
         self._server_number = serial_number
-        self._spec = {config.CORE: specification[config.CORE],
+        self._spec = {
+                 config.MODEL_NAME: specification[config.MODEL_NAME],
+                 config.CORE: specification[config.CORE],
                  config.MEMORY: specification[config.MEMORY]}
         self._cost = {config.HARDWARE_COST, cost[config.HARDWARE_COST],
-                 config.SOFTWARE_COST, cost[config.SOFTWARE_COST]}
+                      config.SOFTWARE_COST, cost[config.SOFTWARE_COST]}
         self._power_status = power_status
-
-        self._model = model
         #initialize the node A.
         self._node = {
-                 
         }
+
+        # TODO node为空时，server对象的power_status为OFF
+
+        # TODO 设置电源的接口
+
+        # TODO 部署虚拟机
+
+        # TODO 迁移虚拟机的上层接口
+
+        # TODO 删除虚拟机的上层接口
+
+        # TODO 添加虚拟机的上层接口
     # member var.
