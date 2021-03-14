@@ -147,7 +147,7 @@ class Server():
             self._nodes['B'].delete_vm(vm)
 
     # 该函数返回服务器对象的编号
-    def get_server_num(self):
+    def get_server_num(self)->config.server_number:
         return self._server_number
     
     # 获取A节点容量
@@ -162,9 +162,17 @@ class Server():
     def get_size(self)->config.specification_dict:
         return self._spec
     # 获取总容量
-    def get_avaliable_size(self):
+    def get_avaliable_size(self)->config.specification_dict:
         a_size = self.get_A_size()
         b_size = self.get_B_size()
         return {config.CORE: a_size[config.CORE] + b_size[config.CORE],
                 config.MEMORY: a_size[config.MEMORY] + b_size[config.MEMORY]}
-    
+    # 判断该服务器够不够用
+    def check_capacity(self, vm: VirtualMachine)->bool:
+        vm_cpu_size = vm.get_all_cpu_core()
+        vm_mem_size = vm.get_all_memory()
+        server_ava = self.get_avaliable_size()
+        if server_ava[config.CORE] >= vm_cpu_size and server_ava[config.MEMORY] >= vm_mem_size:
+            return True
+        else:
+            return False
