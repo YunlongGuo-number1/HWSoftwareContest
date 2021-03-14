@@ -97,18 +97,19 @@ class NodeVector():
 
 class Server():
     def __init__(self, serial_number: config.server_number, 
+                 name: str,
                  specification: config.specification_dict, 
                  cost: config.cost_dict, 
                  power_status: config.is_on):
 
         self._server_number = serial_number
         self._spec = {
-                 config.MODEL_NAME: specification[config.MODEL_NAME],
                  config.CORE: specification[config.CORE],
                  config.MEMORY: specification[config.MEMORY]}
         self._cost = {config.HARDWARE_COST, cost[config.HARDWARE_COST],
                       config.SOFTWARE_COST, cost[config.SOFTWARE_COST]}
         self._power_status = power_status
+        self._name = name
         #initialize the node A, B
         self._nodes = {
             config.A: NodeVector(config.A, {config.CORE: self._spec[config.CORE] /2, 
@@ -122,7 +123,7 @@ class Server():
     # 设置电源的接口
     def set_power_status(self, status: POWER):
         self._power_status = status
-
+    
     # 部署虚拟机的接口
     def deploy_vm(self, vm: VirtualMachine, node: node_name = ''):
         vm_node = vm.get_node_mode()
@@ -148,3 +149,22 @@ class Server():
     # 该函数返回服务器对象的编号
     def get_server_num(self):
         return self._server_number
+    
+    # 获取A节点容量
+    def get_A_size(self)->config.specification_dict:
+        return {config.CORE: self._nodes['A'].get_avaliable_cpu(),
+                config.MEMORY: self._nodes['A'].get_avaliable_mem()}
+    # 获取B节点容量
+    def get_B_size(self)->config.specification_dict:
+        return {config.CORE: self._nodes['B'].get_avaliable_cpu(),
+                config.MEMORY: self._nodes['B'].get_avaliable_mem()}
+    # 获取 服务器规格
+    def get_size(self)->config.specification_dict:
+        return self._spec
+    # 获取总容量
+    def get_avaliable_size(self):
+        a_size = self.get_A_size()
+        b_size = self.get_B_size()
+        return {config.CORE: a_size[config.CORE] + b_size[config.CORE],
+                config.MEMORY: a_size[config.MEMORY] + b_size[config.MEMORY]}
+    
